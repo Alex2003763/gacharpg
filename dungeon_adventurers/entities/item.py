@@ -2,12 +2,13 @@ from dungeon_adventurers.game_data.game_enums import ItemType
 
 class Item:
     """
-    Represents an item that a hero can possess.
+    Represents a generic item in the game.
+    This class is intended to be a base for more specific item types.
     """
-    def __init__(self, name: str, item_type: ItemType, effect_value: int):
+    def __init__(self, name: str, item_type: ItemType, description: str = ""):
         self.name = name
         self.item_type = item_type
-        self.effect_value = effect_value
+        self.description = description
 
     def __str__(self) -> str:
-        return f"Item: {self.name} (Type: {self.item_type.value}, Effect: {self.effect_value})"
+        return f"Item: {self.name} (Type: {self.item_type.value})"

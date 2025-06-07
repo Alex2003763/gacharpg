@@ -38,3 +38,23 @@ class ItemType(Enum):
     WEAPON = "Weapon"
     ARMOR = "Armor"
     POTION = "Potion"
+
+class EquipmentSlot(Enum):
+    """
+    Represents the slot where an equipment can be fitted.
+    """
+    WEAPON = auto()
+    HELMET = auto()
+    CHEST_ARMOR = auto()
+    SHOES = auto()
+    ACCESSORY = auto()
+
+class ItemQuality(Enum):
+    """
+    Represents the quality or grade of an item/equipment.
+    """
+    COMMON = auto()
+    UNCOMMON = auto()
+    RARE = auto()
+    EPIC = auto()
+    LEGENDARY = auto()
