@@ -1,0 +1,53 @@
+#:kivy 1.11.1
+
+<MainMenuScreen>:
+    canvas.before:
+        Color:
+            rgba: 0.15, 0.15, 0.15, 1 # Slightly different dark background
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: '15dp' # Space between title and button box, and between buttons
+        padding: '50dp'
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5} # Center the main BoxLayout
+        size_hint: 0.6, 0.6 # Make the main BoxLayout take 60% of screen width/height
+
+        Label:
+            text: 'Dungeon Adventurers'
+            font_size: '40sp' # Larger title on main menu
+            size_hint_y: 0.3 # Allocate 30% of the BoxLayout's height to title
+            halign: 'center'
+            valign: 'top'
+
+        BoxLayout: # Inner BoxLayout for buttons
+            orientation: 'vertical'
+            spacing: '10dp'
+            size_hint_y: 0.7 # Allocate 70% of the BoxLayout's height to buttons
+
+            Button:
+                id: start_sim_btn
+                text: 'Start Gacha Simulation'
+                font_size: '20sp'
+                size_hint_y: None
+                height: '48dp'
+                on_press: root.on_start_sim_press()
+
+            Button:
+                id: options_btn
+                text: 'Options'
+                font_size: '20sp'
+                size_hint_y: None
+                height: '48dp'
+                on_press: root.on_options_press()
+                disabled: True # Non-functional for now
+
+            Button:
+                id: quit_btn
+                text: 'Quit Game'
+                font_size: '20sp'
+                size_hint_y: None
+                height: '48dp'
+                on_press: root.on_quit_press()

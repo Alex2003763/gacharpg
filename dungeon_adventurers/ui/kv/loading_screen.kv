@@ -1,0 +1,35 @@
+#:kivy 1.11.1
+
+<LoadingScreen>:
+    canvas.before:
+        Color:
+            rgba: 0.1, 0.1, 0.1, 1 # Dark grey background
+        Rectangle:
+            pos: self.pos
+            size: self.size
+
+    BoxLayout:
+        orientation: 'vertical'
+        spacing: '20dp'
+        padding: '50dp'
+        pos_hint: {'center_x': 0.5, 'center_y': 0.5}
+        size_hint: None, None
+        width: '400dp'
+        height: '200dp'
+
+        Label:
+            text: 'Dungeon Adventurers'
+            font_size: '32sp'
+            halign: 'center'
+            valign: 'middle'
+            size_hint_y: None
+            height: self.texture_size[1] + dp(10)
+
+        Label:
+            id: loading_label
+            text: 'Loading...'
+            font_size: '24sp'
+            halign: 'center'
+            valign: 'middle'
+            size_hint_y: None
+            height: self.texture_size[1]
