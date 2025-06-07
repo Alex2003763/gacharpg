@@ -1,0 +1,48 @@
+#:kivy 1.11.1
+
+<GachaScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: '10dp'
+        spacing: '10dp'
+
+        # Top section for status
+        BoxLayout:
+            size_hint_y: None
+            height: '40dp'
+            spacing: '10dp'
+            Label:
+                id: currency_label
+                text: 'Currency: N/A'
+                size_hint_x: 0.7
+            Label:
+                id: pity_label
+                text: 'Pity: 0/100 (SSR)' # Example, will be updated by Python code
+                size_hint_x: 0.3
+
+        # Middle section for pull results
+        ScrollView:
+            size_hint_y: 0.8 # Make it take most of the space
+            GridLayout:
+                id: pull_results_grid
+                cols: 1
+                size_hint_y: None # Important for ScrollView to work with GridLayout
+                height: self.minimum_height # Adjust height to content
+                padding: '5dp'
+                spacing: '5dp'
+                # Labels will be added here by Python code
+
+        # Bottom section for action buttons
+        BoxLayout:
+            size_hint_y: None
+            height: '50dp'
+            spacing: '10dp'
+            Button:
+                text: 'Pull 1'
+                on_press: root.pull_one_pressed()
+            Button:
+                text: 'Pull 10'
+                on_press: root.pull_ten_pressed()
+            Button:
+                text: 'Back to Menu'
+                on_press: root.back_to_menu_pressed()
