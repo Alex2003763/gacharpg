@@ -57,3 +57,16 @@ The primary way to see the current systems in action is by running the main simu
 *   Dungeon Exploration.
 *   User Interface (GUI).
 *   And much more from the original Game Design Document!
+
+
+## Running the GUI Application (Kivy)
+
+**Prerequisites:**
+*   Python 3.10 or higher.
+*   Kivy: Install using `python -m pip install "kivy[base]" kivy_examples` or `python -m pip install -r requirements.txt`.
+
+**To Run the GUI:**
+1.  Navigate to the project root directory.
+2.  Execute: `python -m dungeon_adventurers.main_gui`
+
+*Note: The original `python -m dungeon_adventurers.main` command still runs the console-based Gacha simulation.*
