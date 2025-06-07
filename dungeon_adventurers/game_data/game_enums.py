@@ -58,3 +58,22 @@ class ItemQuality(Enum):
     RARE = auto()
     EPIC = auto()
     LEGENDARY = auto()
+
+class SkillType(Enum):
+    """
+    Defines the type of a skill (e.g., active, passive).
+    """
+    ACTIVE = auto()
+    PASSIVE = auto()
+    LEADER = auto()
+
+class SkillTargetType(Enum):
+    """
+    Defines who or what a skill can target.
+    """
+    SELF = auto()
+    ENEMY_SINGLE = auto()
+    ENEMY_TEAM = auto() # Targets all enemies
+    ALLY_SINGLE = auto()
+    ALLY_TEAM = auto()   # Targets all allies (excluding self if needed by specific logic)
+    ALL_CHARACTERS = auto() # Targets everyone on the field

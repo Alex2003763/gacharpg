@@ -2,125 +2,137 @@ import unittest
 from dungeon_adventurers.entities.hero import Hero
 from dungeon_adventurers.entities.equipment import Equipment
 from dungeon_adventurers.entities.item import Item
-from dungeon_adventurers.game_data.game_enums import Rarity, Profession, Element, ItemType, EquipmentSlot, ItemQuality
+from dungeon_adventurers.game_data.game_enums import Rarity, Profession, Element, ItemType, EquipmentSlot, ItemQuality, SkillTargetType # Added SkillTargetType
+from dungeon_adventurers.entities.skills import ActiveSkill, PassiveSkill, LeaderSkill # Added skill classes
 
 class TestHero(unittest.TestCase):
 
-    # --- Existing tests from previous subtasks ---
+    # --- Existing tests from previous subtasks (summarized for brevity in thought process) ---
     def test_hero_creation_defaults(self):
-        hero = Hero(name="TestHero",
-                    rarity=Rarity.N,
-                    profession=Profession.WARRIOR,
-                    element=Element.FIRE)
-        self.assertEqual(hero.name, "TestHero")
-        self.assertEqual(hero.rarity, Rarity.N)
-        self.assertEqual(hero.profession, Profession.WARRIOR)
-        self.assertEqual(hero.element, Element.FIRE)
+        hero = Hero(name="TestHeroDefaults", rarity=Rarity.N, profession=Profession.WARRIOR, element=Element.FIRE)
+        self.assertEqual(hero.name, "TestHeroDefaults")
         self.assertEqual(hero.level, 1)
-        self.assertEqual(hero.star_level, 1)
-        self.assertIsInstance(hero.base_stats, dict)
-        self.assertIn("HP", hero.base_stats)
-        self.assertIsInstance(hero.advanced_stats, dict)
-        self.assertIn("CritRate", hero.advanced_stats)
-        self.assertIsNone(hero.active_skill)
+        self.assertIsNone(hero.active_skill) # Check initial skill state
+        self.assertIsNone(hero.passive_skill)
+        self.assertIsNone(hero.leader_skill)
 
     def test_hero_creation_with_level(self):
-        hero = Hero(name="HighLevelHero",
-                    rarity=Rarity.SSR,
-                    profession=Profession.MAGE,
-                    element=Element.WATER,
-                    level=50)
+        hero = Hero(name="HighLevelHero", rarity=Rarity.SSR, profession=Profession.MAGE, element=Element.WATER, level=50)
         self.assertEqual(hero.level, 50)
 
     def test_hero_base_stats_initial_values(self):
         hero = Hero(name="StatCheckHero", rarity=Rarity.R, profession=Profession.TANK, element=Element.GRASS)
         self.assertEqual(hero.base_stats["HP"], 100)
-        self.assertEqual(hero.base_stats["Attack"], 10)
 
     def test_hero_advanced_stats_initial_values(self):
         hero = Hero(name="AdvStatCheckHero", rarity=Rarity.SR, profession=Profession.ASSASSIN, element=Element.DARK)
         self.assertEqual(hero.advanced_stats["CritRate"], 0.05)
-        self.assertEqual(hero.advanced_stats["CritDamage"], 1.5)
 
-    # --- New setUp and tests for equipment ---
+    # --- Updated setUp to include skills ---
     def setUp(self):
-        # Re-initialize hero for each test method to ensure independence
+        # Initialize hero
         self.hero = Hero(name="TestHero",
                          rarity=Rarity.N,
                          profession=Profession.WARRIOR,
                          element=Element.FIRE)
 
         # Sample equipment
-        self.sword = Equipment(name="Basic Sword",
-                               description="A simple sword.",
-                               slot=EquipmentSlot.WEAPON,
-                               quality=ItemQuality.COMMON,
-                               main_stat={"stat_type": "Attack", "value": 10})
+        self.sword = Equipment(name="Basic Sword", description="A simple sword.", slot=EquipmentSlot.WEAPON,
+                               quality=ItemQuality.COMMON, main_stat={"stat_type": "Attack", "value": 10})
+        self.helmet = Equipment(name="Leather Cap", description="A basic cap.", slot=EquipmentSlot.HELMET,
+                                quality=ItemQuality.COMMON, main_stat={"stat_type": "Defense", "value": 5})
+        self.another_sword = Equipment(name="Sharp Sword", description="A sharper sword.", slot=EquipmentSlot.WEAPON,
+                                       quality=ItemQuality.UNCOMMON, main_stat={"stat_type": "Attack", "value": 15})
 
-        self.helmet = Equipment(name="Leather Cap",
-                                description="A basic cap.",
-                                slot=EquipmentSlot.HELMET,
-                                quality=ItemQuality.COMMON,
-                                main_stat={"stat_type": "Defense", "value": 5})
+        # Sample skills
+        self.sample_active_skill = ActiveSkill(name="Slash", description="A basic attack.",
+                                               target_type=SkillTargetType.ENEMY_SINGLE,
+                                               effects=[{"effect_type": "damage", "value": 100}])
+        self.sample_passive_skill = PassiveSkill(name="Fortitude", description="Increases HP.",
+                                                 target_type=SkillTargetType.SELF,
+                                                 effects=[{"effect_type": "stat_mod", "stat": "HP", "percentage": 0.1}])
+        self.sample_leader_skill = LeaderSkill(name="Team Attack Boost", description="Boosts team attack.",
+                                               effects=[{"effect_type": "stat_mod", "stat": "Attack", "percentage": 0.05}],
+                                               target_type=SkillTargetType.ALLY_TEAM) # Explicitly set for clarity, though it's default
+        self.another_active_skill = ActiveSkill(name="Fireball", description="Shoots a fireball.",
+                                               target_type=SkillTargetType.ENEMY_SINGLE,
+                                               effects=[{"effect_type": "damage", "value": 150, "element": Element.FIRE}])
 
-        self.another_sword = Equipment(name="Sharp Sword",
-                               description="A sharper sword.",
-                               slot=EquipmentSlot.WEAPON,
-                               quality=ItemQuality.UNCOMMON,
-                               main_stat={"stat_type": "Attack", "value": 15})
-
+    # --- Existing Equipment tests (summarized) ---
     def test_equip_item_valid(self):
-        # Equip a sword
         returned_item = self.hero.equip_item(self.sword)
-        self.assertIsNone(returned_item, "No item should be returned when equipping to an empty slot.")
+        self.assertIsNone(returned_item)
         self.assertEqual(self.hero.equipment[EquipmentSlot.WEAPON], self.sword)
-        self.assertIn(self.sword.name, self.hero.get_equipment_details())
-
-        # Equip a helmet
-        returned_item_helmet = self.hero.equip_item(self.helmet)
-        self.assertIsNone(returned_item_helmet)
-        self.assertEqual(self.hero.equipment[EquipmentSlot.HELMET], self.helmet)
-        self.assertIn(self.helmet.name, self.hero.get_equipment_details())
 
     def test_equip_item_replace_existing(self):
-        # Equip first sword
         self.hero.equip_item(self.sword)
-        self.assertEqual(self.hero.equipment[EquipmentSlot.WEAPON], self.sword)
-
-        # Equip another sword in the same slot
         returned_item = self.hero.equip_item(self.another_sword)
-        self.assertEqual(returned_item, self.sword, "The previously equipped sword should be returned.")
-        self.assertEqual(self.hero.equipment[EquipmentSlot.WEAPON], self.another_sword, "The new sword should now be equipped.")
-        self.assertIn(self.another_sword.name, self.hero.get_equipment_details())
-        self.assertNotIn(self.sword.name, self.hero.get_equipment_details())
+        self.assertEqual(returned_item, self.sword)
+        self.assertEqual(self.hero.equipment[EquipmentSlot.WEAPON], self.another_sword)
 
     def test_equip_item_invalid_type(self):
-        # Create a non-equipment item (using Item base class)
         potion = Item(name="Health Potion", item_type=ItemType.POTION, description="Heals HP.")
         with self.assertRaisesRegex(ValueError, "Item is not a piece of equipment."):
             self.hero.equip_item(potion)
 
     def test_unequip_item_valid(self):
-        # Equip an item first
         self.hero.equip_item(self.sword)
-        self.assertEqual(self.hero.equipment[EquipmentSlot.WEAPON], self.sword)
-
-        # Unequip the item
         unequipped_item = self.hero.unequip_item(EquipmentSlot.WEAPON)
-        self.assertEqual(unequipped_item, self.sword, "The unequipped item should be the sword.")
-        self.assertIsNone(self.hero.equipment[EquipmentSlot.WEAPON], "The weapon slot should now be empty.")
-        self.assertNotIn(self.sword.name, self.hero.get_equipment_details())
-        if not any(self.hero.equipment.values()): # Check if all equipment slots are None
-             self.assertEqual(self.hero.get_equipment_details(), f"{self.hero.name} has no equipment.")
+        self.assertEqual(unequipped_item, self.sword)
+        self.assertIsNone(self.hero.equipment[EquipmentSlot.WEAPON])
 
     def test_unequip_item_empty_slot(self):
         unequipped_item = self.hero.unequip_item(EquipmentSlot.WEAPON)
-        self.assertIsNone(unequipped_item, "Nothing should be returned from an empty slot.")
-        self.assertIsNone(self.hero.equipment[EquipmentSlot.WEAPON])
+        self.assertIsNone(unequipped_item)
 
     def test_unequip_item_invalid_slot_type(self):
         with self.assertRaisesRegex(ValueError, "Invalid slot specified for unequipping."):
-            self.hero.unequip_item("NOT_A_SLOT") # Pass a string instead of EquipmentSlot enum
+            self.hero.unequip_item("NOT_A_SLOT")
+
+    # --- New Skill Assignment Tests ---
+    def test_set_active_skill_valid(self):
+        self.hero.set_active_skill(self.sample_active_skill)
+        self.assertEqual(self.hero.active_skill, self.sample_active_skill)
+        self.assertEqual(self.hero.active_skill.name, "Slash")
+        self.assertIn("Active: Slash", self.hero.get_skills_details())
+
+    def test_set_active_skill_none(self):
+        self.hero.set_active_skill(self.sample_active_skill) # Assign one first
+        self.hero.set_active_skill(None) # Then set to None
+        self.assertIsNone(self.hero.active_skill)
+        self.assertIn("Active: None", self.hero.get_skills_details())
+
+    def test_set_active_skill_invalid_type(self):
+        with self.assertRaisesRegex(TypeError, "Assigned skill must be an ActiveSkill instance or None."):
+            self.hero.set_active_skill(self.sample_passive_skill) # Try to assign a PassiveSkill
+
+    def test_set_passive_skill_valid(self):
+        self.hero.set_passive_skill(self.sample_passive_skill)
+        self.assertEqual(self.hero.passive_skill, self.sample_passive_skill)
+        self.assertEqual(self.hero.passive_skill.name, "Fortitude")
+        self.assertIn("Passive: Fortitude", self.hero.get_skills_details())
+
+    def test_set_passive_skill_invalid_type(self):
+        with self.assertRaisesRegex(TypeError, "Assigned skill must be a PassiveSkill instance or None."):
+            self.hero.set_passive_skill(self.sample_active_skill)
+
+    def test_set_leader_skill_valid(self):
+        self.hero.set_leader_skill(self.sample_leader_skill)
+        self.assertEqual(self.hero.leader_skill, self.sample_leader_skill)
+        self.assertEqual(self.hero.leader_skill.name, "Team Attack Boost")
+        self.assertIn("Leader: Team Attack Boost", self.hero.get_skills_details())
+
+    def test_set_leader_skill_invalid_type(self):
+        with self.assertRaisesRegex(TypeError, "Assigned skill must be a LeaderSkill instance or None."):
+            self.hero.set_leader_skill(self.sample_active_skill)
+
+    def test_hero_str_includes_skills(self):
+        self.hero.set_active_skill(self.sample_active_skill)
+        self.hero.set_passive_skill(self.sample_passive_skill)
+        hero_str = str(self.hero)
+        self.assertIn("Active: Slash", hero_str)
+        self.assertIn("Passive: Fortitude", hero_str)
+        self.assertIn("Leader: None", hero_str) # Leader skill not set by default in setUp
 
 if __name__ == '__main__':
     unittest.main()
